@@ -35,39 +35,48 @@ function M.run(bufnr)
   local bufname = vim.api.nvim_buf_get_name(bufnr)
   local args = { "credo", "--format", "json", "--strict", bufname }
 
-  Job:new({
-    command = "mix",
-    args = args,
-    on_exit = vim.schedule_wrap(function(j, status)
-      if status == 0 then
-        return
-      end
+  Job
+    :new({
+      command = "mix",
+      args = args,
+      on_exit = vim.schedule_wrap(function(j, status)
+        if status == 0 then
+          return
+        end
 
-      if status >= 128 then
         local error = table.concat(j:stderr_result(), "\n")
-        Utils.error("[mix credo] failed with code " .. status .. "\n" .. error)
-        return
-      end
+        if status == 1 and error ~= '"credo" could not be found' then
+          return
+        end
 
-      local response = vim.json.decode(table.concat(j:result(), "\n"))
+        if status >= 128 then
+          Utils.error(
+            "[mix credo] failed with code " .. status .. "\n" .. error
+          )
+          return
+        end
 
-      local issues = {}
-      for _, issue in pairs(response.issues) do
-        table.insert(issues, {
-          bufnr = bufnr,
-          lnum = tonumber(issue.line_no) - 1,
-          col = tonumber(issue.column) or 0,
-          end_col = tonumber(issue.column_end) or 0,
-          message = issue.message,
-          severity = options.mappings[issue.category],
-          source = "MixCredo",
-          user_data = {},
-        })
-      end
+        local content = table.concat(j:result(), "\n")
+        local response = vim.json.decode(content)
 
-      vim.diagnostic.set(namespace, bufnr, issues, {})
-    end),
-  }):start()
+        local issues = {}
+        for _, issue in pairs(response.issues) do
+          table.insert(issues, {
+            bufnr = bufnr,
+            lnum = tonumber(issue.line_no) - 1,
+            col = tonumber(issue.column) or 0,
+            end_col = tonumber(issue.column_end) or 0,
+            message = issue.message,
+            severity = options.mappings[issue.category],
+            source = "MixCredo",
+            user_data = {},
+          })
+        end
+
+        vim.diagnostic.set(namespace, bufnr, issues, {})
+      end),
+    })
+    :start()
 end
 
 vim.api.nvim_create_user_command("MixCredo", function()
