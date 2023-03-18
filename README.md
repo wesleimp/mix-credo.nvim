@@ -42,7 +42,7 @@ require("mix-credo").setup({
 
 The `mix-credo` setup creates an `augroup` assinging `BufEnter` and `BufWritePost`, in that way, `mix credo` runs immediately when you open or save a file.
 
-It's also possible to run manually using the commando `:MixCredo`
+It's also possible to run manually by using the command `:MixCredo`
 
 ## LICENSE
 
