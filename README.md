@@ -2,7 +2,7 @@
 
 Lsp diagnostics for mix credo
 
-![mix credo issues](/assets/screenshot.png "Mix credo issues").
+![mix credo issues](/assets/screenshot.png "Mix credo issues")
 
 ## Requirements
 
