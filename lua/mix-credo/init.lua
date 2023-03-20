@@ -24,12 +24,12 @@ function M.setup(opts)
     group = augroup,
     pattern = options.patterns,
     callback = function()
-      M.run(vim.api.nvim_get_current_buf())
+      M.attach_to_buf(vim.api.nvim_get_current_buf())
     end,
   })
 end
 
-function M.run(bufnr)
+function M.attach_to_buf(bufnr)
   vim.api.nvim_buf_clear_namespace(bufnr, namespace, 0, -1)
 
   local bufname = vim.api.nvim_buf_get_name(bufnr)
@@ -80,7 +80,7 @@ function M.run(bufnr)
 end
 
 vim.api.nvim_create_user_command("MixCredo", function()
-  M.run(vim.api.nvim_get_current_buf())
+  M.attach_to_buf(vim.api.nvim_get_current_buf())
 end, {})
 
 return M
