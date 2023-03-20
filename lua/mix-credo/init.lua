@@ -40,10 +40,6 @@ function M.attach_to_buf(bufnr)
       command = "mix",
       args = args,
       on_exit = vim.schedule_wrap(function(j, status)
-        if status == 0 then
-          return
-        end
-
         local error = table.concat(j:stderr_result(), "\n")
         if status == 1 and error ~= '"credo" could not be found' then
           return
