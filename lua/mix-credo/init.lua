@@ -57,11 +57,21 @@ function M.attach_to_buf(bufnr)
 
         local issues = {}
         for _, issue in pairs(response.issues) do
+          local column = tonumber(issue.column) or 0
+          if column > 0 then
+            column = column - 1
+          end
+
+          local column_end = tonumber(issue.column_end) or 0
+          if column_end > 0 then
+            column_end = column_end - 1
+          end
+
           table.insert(issues, {
             bufnr = bufnr,
             lnum = tonumber(issue.line_no) - 1,
-            col = tonumber(issue.column) or 0,
-            end_col = tonumber(issue.column_end) or 0,
+            col = column,
+            end_col = column_end,
             message = issue.message,
             severity = options.mappings[issue.category],
             source = "MixCredo",
